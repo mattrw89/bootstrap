@@ -430,8 +430,8 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.position'])
   showButtonBar: true
 })
 
-.directive('datepickerPopup', ['$compile', '$parse', '$document', '$position', 'dateFilter', 'datepickerPopupConfig',
-function ($compile, $parse, $document, $position, dateFilter, datepickerPopupConfig) {
+.directive('datepickerPopup', ['$compile', '$parse', '$document', '$position', 'dateFilter', 'datepickerPopupConfig', '$timeout',
+function ($compile, $parse, $document, $position, dateFilter, datepickerPopupConfig, $timeout) {
   return {
     restrict: 'EA',
     require: 'ngModel',
@@ -522,8 +522,10 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         ngModel.$render();
 
         if ( closeOnDateSelection ) {
-          scope.isOpen = false;
-          element[0].focus();
+          $timeout(function() {
+            scope.isOpen = false;
+            element[0].focus();
+          });
         }
       };
 
@@ -589,8 +591,10 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
       };
 
       scope.close = function() {
-        scope.isOpen = false;
-        element[0].focus();
+        $timeout(function(){
+          scope.isOpen = false;
+          element[0].focus();
+        });
       };
 
       var $popup = $compile(popupEl)(scope);
