@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
 
- * Version: 0.11.0-SNAPSHOT - 2014-04-21
+ * Version: 0.11.0-SNAPSHOT - 2014-04-22
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.modal","ui.bootstrap.tabs","ui.bootstrap.position","ui.bootstrap.bindHtml","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.timepicker","ui.bootstrap.datepicker"]);
@@ -2157,8 +2157,8 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.position'])
   showButtonBar: true
 })
 
-.directive('datepickerPopup', ['$compile', '$parse', '$document', '$position', 'dateFilter', 'datepickerPopupConfig',
-function ($compile, $parse, $document, $position, dateFilter, datepickerPopupConfig) {
+.directive('datepickerPopup', ['$compile', '$parse', '$document', '$position', 'dateFilter', 'datepickerPopupConfig', '$timeout',
+function ($compile, $parse, $document, $position, dateFilter, datepickerPopupConfig, $timeout) {
   return {
     restrict: 'EA',
     require: 'ngModel',
@@ -2249,8 +2249,10 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
         ngModel.$render();
 
         if ( closeOnDateSelection ) {
-          scope.isOpen = false;
-          element[0].focus();
+          $timeout(function() {
+            scope.isOpen = false;
+            element[0].focus();
+          });
         }
       };
 
@@ -2316,8 +2318,10 @@ function ($compile, $parse, $document, $position, dateFilter, datepickerPopupCon
       };
 
       scope.close = function() {
-        scope.isOpen = false;
-        element[0].focus();
+        $timeout(function(){
+          scope.isOpen = false;
+          element[0].focus();
+        });
       };
 
       var $popup = $compile(popupEl)(scope);
