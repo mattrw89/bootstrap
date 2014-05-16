@@ -1351,6 +1351,19 @@ describe('datepicker directive', function () {
       });
     });
 
+    describe('european format', function () {
+      it('dd.MM.yyyy', function() {
+        var wrapElement = $compile('<div><input ng-model="date" datepicker-popup="dd.MM.yyyy"><div>')($rootScope);
+        $rootScope.$digest();
+        assignElements(wrapElement);
+
+        changeInputValueTo(inputEl, '11.08.2013');
+        expect($rootScope.date.getFullYear()).toEqual(2013);
+        expect($rootScope.date.getMonth()).toEqual(7);
+        expect($rootScope.date.getDate()).toEqual(11);
+      });
+    });
+
     describe('`close-on-date-selection` attribute', function () {
       beforeEach(inject(function() {
         $rootScope.close = false;
@@ -1528,6 +1541,10 @@ describe('datepicker directive', function () {
     describe('with an append-to-body attribute', function() {
       beforeEach(function() {
         $rootScope.date = new Date();
+      });
+
+      afterEach(function () {
+        $document.find('body').find('.dropdown-menu').remove();
       });
 
       it('should append to the body', function() {

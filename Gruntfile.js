@@ -16,8 +16,8 @@ module.exports = function(grunt) {
   grunt.util.linefeed = '\n';
 
   grunt.initConfig({
-    ngversion: '1.2.10',
-    bsversion: '3.0.3',
+    ngversion: '1.2.16',
+    bsversion: '3.1.1',
     modules: [],//to be filled in by build task
     pkg: grunt.file.readJSON('package.json'),
     dist: 'dist',
@@ -138,6 +138,7 @@ module.exports = function(grunt) {
       },
       travis: {
         singleRun: true,
+        reporters: ['dots'],
         browsers: ['Firefox']
       },
       coverage: {
