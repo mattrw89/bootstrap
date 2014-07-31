@@ -2,7 +2,7 @@
  * angular-ui-bootstrap
  * http://angular-ui.github.io/bootstrap/
 
- * Version: 0.12.0-SNAPSHOT - 2014-05-16
+ * Version: 0.12.0-SNAPSHOT - 2014-07-31
  * License: MIT
  */
 angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.modal","ui.bootstrap.tabs","ui.bootstrap.position","ui.bootstrap.bindHtml","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.timepicker","ui.bootstrap.dateparser","ui.bootstrap.datepicker","ui.bootstrap.dropdown"]);
@@ -185,8 +185,18 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         $timeout(function () {
           // trigger CSS transitions
           scope.animate = true;
-          // focus a freshly-opened modal
-          element[0].focus();
+
+          /**
+           * Auto-focusing of a freshly-opened modal element causes any child elements
+           * with the autofocus attribute to loose focus. This is an issue on touch
+           * based devices which will show and then hide the onscreen keyboard.
+           * Attempts to refocus the autofocus element via JavaScript will not reopen
+           * the onscreen keyboard. Fixed by updated the focusing logic to only autofocus
+           * the modal element if the modal does not contain an autofocus element.
+           */
+          if (!element[0].querySelectorAll('[autofocus]').length) {
+            element[0].focus();
+          }
         });
 
         scope.close = function (evt) {
@@ -394,8 +404,9 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
 
           function getTemplatePromise(options) {
             return options.template ? $q.when(options.template) :
-              $http.get(options.templateUrl, {cache: $templateCache}).then(function (result) {
-                return result.data;
+              $http.get(angular.isFunction(options.templateUrl) ? (options.templateUrl)() : options.templateUrl,
+                {cache: $templateCache}).then(function (result) {
+                  return result.data;
               });
           }
 
@@ -445,7 +456,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
               modalScope.$close = modalInstance.close;
               modalScope.$dismiss = modalInstance.dismiss;
 
-              var ctrlLocals = {};
+              var ctrlInstance, ctrlLocals = {};
               var resolveIter = 1;
 
               //controllers
@@ -456,7 +467,10 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
                   ctrlLocals[key] = tplAndVars[resolveIter++];
                 });
 
-                $controller(modalOptions.controller, ctrlLocals);
+                ctrlInstance = $controller(modalOptions.controller, ctrlLocals);
+                if (modalOptions.controller) {
+                  modalScope[modalOptions.controllerAs] = ctrlInstance;
+                }
               }
 
               $modalStack.open(modalInstance, {
@@ -1917,7 +1931,7 @@ angular.module('ui.bootstrap.datepicker', ['ui.bootstrap.dateparser', 'ui.bootst
     self[key] = angular.isDefined($attrs[key]) ? (index < 8 ? $interpolate($attrs[key])($scope.$parent) : $scope.$parent.$eval($attrs[key])) : datepickerConfig[key];
   });
 
-  // Watchable attributes
+  // Watchable date attributes
   angular.forEach(['minDate', 'maxDate'], function( key ) {
     if ( $attrs[key] ) {
       $scope.$parent.$watch($parse($attrs[key]), function(value) {
@@ -2364,12 +2378,24 @@ function ($compile, $parse, $document, $position, dateFilter, dateParser, datepi
         });
       }
 
-      angular.forEach(['minDate', 'maxDate'], function( key ) {
+      scope.watchData = {};
+      angular.forEach(['minDate', 'maxDate', 'datepickerMode'], function( key ) {
         if ( attrs[key] ) {
-          scope.$parent.$watch($parse(attrs[key]), function(value){
-            scope[key] = value;
+          var getAttribute = $parse(attrs[key]);
+          scope.$parent.$watch(getAttribute, function(value){
+            scope.watchData[key] = value;
           });
-          datepickerEl.attr(cameltoDash(key), key);
+          datepickerEl.attr(cameltoDash(key), 'watchData.' + key);
+
+          // Propagate changes from datepicker to outside
+          if ( key === 'datepickerMode' ) {
+            var setAttribute = getAttribute.assign;
+            scope.$watch('watchData.' + key, function(value, oldvalue) {
+              if ( value !== oldvalue ) {
+                setAttribute(scope.$parent, value);
+              }
+            });
+          }
         }
       });
       if (attrs.dateDisabled) {
@@ -2630,7 +2656,6 @@ angular.module('ui.bootstrap.dropdown', [])
 
 .directive('dropdown', function() {
   return {
-    restrict: 'CA',
     controller: 'DropdownController',
     link: function(scope, element, attrs, dropdownCtrl) {
       dropdownCtrl.init( element );
@@ -2640,7 +2665,6 @@ angular.module('ui.bootstrap.dropdown', [])
 
 .directive('dropdownToggle', function() {
   return {
-    restrict: 'CA',
     require: '?^dropdown',
     link: function(scope, element, attrs, dropdownCtrl) {
       if ( !dropdownCtrl ) {
