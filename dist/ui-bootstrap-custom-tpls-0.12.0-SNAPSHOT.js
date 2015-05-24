@@ -428,6 +428,14 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             return promisesArr;
           }
 
+          $modal.setCallbacks = function(openFn, closeFn, dismissFn) {
+            angular.extend($modalProvider.options, {
+              modalOpenFn: openFn,
+              modalCloseFn: closeFn,
+              modalDismissFn: dismissFn
+            });
+          };
+
           $modal.open = function (modalOptions) {
 
             var modalResultDeferred = $q.defer();
