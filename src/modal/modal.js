@@ -296,6 +296,10 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
         return openedWindows.top();
       };
 
+      $modalStack.length = function() {
+        return openedWindows.length();
+      };
+
       return $modalStack;
     }])
 
@@ -304,7 +308,10 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
     var $modalProvider = {
       options: {
         backdrop: true, //can be also false or 'static'
-        keyboard: true
+        keyboard: true,
+        modalOpenFn: function() {},
+        modalCloseFn: function() {},
+        modalDismissFn: function() {}
       },
       $get: ['$injector', '$rootScope', '$q', '$http', '$templateCache', '$controller', '$modalStack',
         function ($injector, $rootScope, $q, $http, $templateCache, $controller, $modalStack) {
@@ -334,21 +341,23 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
             var modalResultDeferred = $q.defer();
             var modalOpenedDeferred = $q.defer();
 
+            //merge and clean up options
+            modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
+            modalOptions.resolve = modalOptions.resolve || {};
+
             //prepare an instance of a modal to be injected into controllers and returned to a caller
             var modalInstance = {
               result: modalResultDeferred.promise,
               opened: modalOpenedDeferred.promise,
               close: function (result) {
+                modalOptions.modalCloseFn(modalOptions, result);
                 $modalStack.close(modalInstance, result);
               },
               dismiss: function (reason) {
+                modalOptions.modalDismissFn(modalOptions, reason);
                 $modalStack.dismiss(modalInstance, reason);
               }
             };
-
-            //merge and clean up options
-            modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
-            modalOptions.resolve = modalOptions.resolve || {};
 
             //verify options
             if (!modalOptions.template && !modalOptions.templateUrl) {
@@ -393,6 +402,8 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
                 windowTemplateUrl: modalOptions.windowTemplateUrl,
                 size: modalOptions.size
               });
+
+              modalOptions.openModalFn(modalOptions);
 
             }, function resolveError(reason) {
               modalResultDeferred.reject(reason);
