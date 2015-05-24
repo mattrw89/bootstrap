@@ -5,7 +5,7 @@
  * Version: 0.12.0-SNAPSHOT - 2015-05-23
  * License: MIT
  */
-angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.modal","ui.bootstrap.tabs","ui.bootstrap.position","ui.bootstrap.bindHtml","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.dateparser","ui.bootstrap.datepicker","ui.bootstrap.timepicker","ui.bootstrap.dropdown","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.bindhtml"]);
+angular.module("ui.bootstrap", ["ui.bootstrap.tpls", "ui.bootstrap.transition","ui.bootstrap.modal","ui.bootstrap.tabs","ui.bootstrap.position","ui.bootstrap.bindHtml","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.dateparser","ui.bootstrap.datepicker","ui.bootstrap.timepicker","ui.bootstrap.dropdown","ui.bootstrap.collapse","ui.bootstrap.accordion"]);
 angular.module("ui.bootstrap.tpls", ["template/modal/backdrop.html","template/modal/window.html","template/tabs/tab.html","template/tabs/tabset.html","template/tooltip/tooltip-html-unsafe-popup.html","template/tooltip/tooltip-popup.html","template/popover/popover.html","template/datepicker/datepicker.html","template/datepicker/day.html","template/datepicker/month.html","template/datepicker/popup.html","template/datepicker/year.html","template/timepicker/timepicker.html","template/accordion/accordion-group.html","template/accordion/accordion.html"]);
 angular.module('ui.bootstrap.transition', [])
 
@@ -2710,16 +2710,6 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
   };
 });
 
-angular.module('ui.bootstrap.bindHtml', [])
-
-  .directive('bindHtmlUnsafe', function () {
-    return function (scope, element, attr) {
-      element.addClass('ng-binding').data('$binding', attr.bindHtmlUnsafe);
-      scope.$watch(attr.bindHtmlUnsafe, function bindHtmlUnsafeWatchAction(value) {
-        element.html(value || '');
-      });
-    };
-  });
 angular.module("template/modal/backdrop.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/modal/backdrop.html",
     "<div class=\"modal-backdrop fade {{ backdropClass }}\"\n" +

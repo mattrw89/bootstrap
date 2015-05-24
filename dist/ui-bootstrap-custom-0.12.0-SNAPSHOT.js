@@ -5,7 +5,7 @@
  * Version: 0.12.0-SNAPSHOT - 2015-05-23
  * License: MIT
  */
-angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.modal","ui.bootstrap.tabs","ui.bootstrap.position","ui.bootstrap.bindHtml","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.dateparser","ui.bootstrap.datepicker","ui.bootstrap.timepicker","ui.bootstrap.dropdown","ui.bootstrap.collapse","ui.bootstrap.accordion","ui.bootstrap.bindhtml"]);
+angular.module("ui.bootstrap", ["ui.bootstrap.transition","ui.bootstrap.modal","ui.bootstrap.tabs","ui.bootstrap.position","ui.bootstrap.bindHtml","ui.bootstrap.tooltip","ui.bootstrap.popover","ui.bootstrap.dateparser","ui.bootstrap.datepicker","ui.bootstrap.timepicker","ui.bootstrap.dropdown","ui.bootstrap.collapse","ui.bootstrap.accordion"]);
 angular.module('ui.bootstrap.transition', [])
 
 /**
@@ -2708,14 +2708,3 @@ angular.module('ui.bootstrap.accordion', ['ui.bootstrap.collapse'])
     }
   };
 });
-
-angular.module('ui.bootstrap.bindHtml', [])
-
-  .directive('bindHtmlUnsafe', function () {
-    return function (scope, element, attr) {
-      element.addClass('ng-binding').data('$binding', attr.bindHtmlUnsafe);
-      scope.$watch(attr.bindHtmlUnsafe, function bindHtmlUnsafeWatchAction(value) {
-        element.html(value || '');
-      });
-    };
-  });
