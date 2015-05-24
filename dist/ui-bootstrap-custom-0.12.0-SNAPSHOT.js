@@ -494,7 +494,7 @@ angular.module('ui.bootstrap.modal', ['ui.bootstrap.transition'])
                 size: modalOptions.size
               });
 
-              modalOptions.openModalFn(modalOptions);
+              modalOptions.modalOpenFn(modalOptions);
 
             }, function resolveError(reason) {
               modalResultDeferred.reject(reason);
